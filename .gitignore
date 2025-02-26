@@ -1,0 +1,9 @@
+temp/*
+.venv/
+env/
+venv/
+data/
+pymupdf-venv/
+**/__pycache__/
+mindee_config.json
+pymupdf-venv
