@@ -1,16 +1,14 @@
 # src\query_handler.py
-
 import json
 import re
 import ollama
 import tkinter as tk
 import threading
-import database_utils  # Import the module instead of individual variables
+import database_utils
 from synonyms_seham_winoffre import TABLE_SYNONYMS, COLUMN_SYNONYMS
 from rag_engine import retrieve_relevant_schema, search_relevant_chunks
-from document_processor import document_loaded, full_document_text  # Keep these for now, but we'll update usage
+from document_processor import document_loaded, full_document_text
 from ollama_utils import check_ollama_availability, get_best_available_model
-import document_processor  # Add this to access live state
 
 conversation_history = []
 ollama_available = True
@@ -44,7 +42,7 @@ def preprocess_user_query(user_query):
     return user_query
 
 def generate_sql_query(user_query):
-    if database_utils.db_schema is None:
+    if database_utils.db_schema is None:  # Updated here
         return None
 
     cached_query = retrieve_past_query(user_query)
@@ -124,7 +122,7 @@ def generate_response(chat_window, query_entry, send_btn):
 
     def process_query():
         try:
-            print(f"DEBUG: db_connection={database_utils.db_connection}, document_loaded={document_processor.document_loaded}")
+            print(f"DEBUG: db_connection={database_utils.db_connection}, document_loaded={document_loaded}")
             if user_query.lower() in ["hi", "hello", "hey"]:
                 response = "Hello! How can I assist you today?"
             elif database_utils.db_connection is not None and is_database_query(user_query):
@@ -135,7 +133,7 @@ def generate_response(chat_window, query_entry, send_btn):
                     response = result
                 else:
                     response = "I'm sorry, I couldn't generate a valid SQL query. Try rephrasing your request."
-            elif document_processor.document_loaded:  # Updated to use live state
+            elif document_loaded:
                 print("DEBUG: Entering document query path")
                 retrieved_chunks = search_relevant_chunks(user_query, top_k=3)
                 if not retrieved_chunks:
