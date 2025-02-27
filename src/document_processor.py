@@ -10,7 +10,8 @@ import json
 import time
 import os
 import faiss  # Add this import
-from rag_engine import chunk_text, embedding_model, faiss_index
+import rag_engine
+
 
 # Global variables
 document_name = ""
@@ -18,6 +19,8 @@ document_loaded = False
 full_document_text = ""
 stored_chunks = []
 tk_root = None  # Will be set by main.py
+faiss_index = None
+stored_chunks = []
 
 def set_root(root):
     """Set the global tk_root variable from main.py."""
@@ -53,19 +56,19 @@ def extract_text_from_excel(excel_path):
 def create_vector_store(text_data, chat_window):
     global faiss_index, stored_chunks, document_loaded, full_document_text
     full_document_text = text_data
-    chunks = chunk_text(text_data, max_chunk_size=300)
+    chunks = rag_engine.chunk_text(text_data, max_chunk_size=300)
     print(f"DEBUG: Number of chunks created: {len(chunks)}")
     for i, ch in enumerate(chunks[:3]):
         print(f"DEBUG chunk {i}: {ch[:200]} ...")
-    stored_chunks = chunks
+    rag_engine.stored_chunks = chunks
     chat_window.insert(tk.END, f"Creating {len(chunks)} document chunks for indexing...\n")
     tk_root.update()
     chat_window.insert(tk.END, "Creating document embeddings...\n")
     tk_root.update()
-    embeddings = embedding_model.encode(chunks)
+    embeddings = rag_engine.embedding_model.encode(chunks)
     dimension = embeddings.shape[1]
-    faiss_index = faiss.IndexFlatL2(dimension)  # This line requires the faiss module
-    faiss_index.add(np.array(embeddings).astype('float32'))
+    rag_engine.faiss_index = faiss.IndexFlatL2(dimension)  # This line requires the faiss module
+    rag_engine.faiss_index.add(np.array(embeddings).astype('float32'))
     document_loaded = True
     chat_window.insert(tk.END, f"📄 Successfully indexed {len(chunks)} chunks from document.\n")
 
