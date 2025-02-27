@@ -1,10 +1,14 @@
+# src\rag_engine.py
+
 import re
 import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
 # Initialize global variables
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+# embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+embedding_model = SentenceTransformer("sentence-transformers/distiluse-base-multilingual-cased-v2")
+
 faiss_index = None
 stored_chunks = []
 schema_embeddings = None
@@ -52,15 +56,23 @@ def search_relevant_chunks(query, top_k=3):
     """Finds the most relevant document chunks for the query."""
     global faiss_index, stored_chunks
 
-    if faiss_index is None:
+    if faiss_index is None or len(stored_chunks) == 0:
+        print("DEBUG: FAISS index is empty, retrieval not possible.")
         return []
 
     query_embedding = embedding_model.encode([query])
     distances, indexes = faiss_index.search(np.array(query_embedding).astype('float32'), top_k)
 
+    # Debug: Show retrieved indexes
+    print(f"DEBUG: Query: {query}")
+    print(f"DEBUG: Retrieved chunk indexes: {indexes[0]} with distances: {distances[0]}")
+
     # Get chunks and sort by relevance score (distance)
     results = [(stored_chunks[i], distances[0][j]) for j, i in enumerate(indexes[0]) if i < len(stored_chunks)]
     results.sort(key=lambda x: x[1])  # Sort by distance (lower is better)
+
+    # Debug: Show retrieved chunks
+    print(f"DEBUG: Retrieved Chunks: {results[:top_k]}")
 
     return [chunk for chunk, _ in results]
 

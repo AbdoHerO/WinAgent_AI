@@ -54,6 +54,9 @@ def create_vector_store(text_data, chat_window):
     global faiss_index, stored_chunks, document_loaded, full_document_text
     full_document_text = text_data
     chunks = chunk_text(text_data, max_chunk_size=300)
+    print(f"DEBUG: Number of chunks created: {len(chunks)}")
+    for i, ch in enumerate(chunks[:3]):
+        print(f"DEBUG chunk {i}: {ch[:200]} ...")
     stored_chunks = chunks
     chat_window.insert(tk.END, f"Creating {len(chunks)} document chunks for indexing...\n")
     tk_root.update()
