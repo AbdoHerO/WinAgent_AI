@@ -17,6 +17,7 @@ db_schema_chunks = []
 
 
 def chunk_text(text, max_chunk_size=512, overlap=50):
+# def chunk_text(text, max_chunk_size=500, overlap=100):
     """Splits the text into manageable chunks with overlap for context."""
     paragraphs = re.split(r'\n\s*\n', text)
     chunks = []

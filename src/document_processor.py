@@ -56,7 +56,7 @@ def extract_text_from_excel(excel_path):
 def create_vector_store(text_data, chat_window):
     global faiss_index, stored_chunks, document_loaded, full_document_text
     full_document_text = text_data
-    chunks = rag_engine.chunk_text(text_data, max_chunk_size=300)
+    chunks = rag_engine.chunk_text(text_data, max_chunk_size=500, overlap=100)
     print(f"DEBUG: Number of chunks created: {len(chunks)}")
     for i, ch in enumerate(chunks[:3]):
         print(f"DEBUG chunk {i}: {ch[:200]} ...")
